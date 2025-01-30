@@ -45,7 +45,6 @@ UniGo simplifies transportation for university students by providing a platform 
 ```bash
 git clone [https://github.com/YOUR_USERNAME/UniGo.git](https://github.com/YOUR_USERNAME/UniGo.git)  # Replace with your repository URL
 ```
-````
 
 2.  **Navigate to the project directory:**
 
