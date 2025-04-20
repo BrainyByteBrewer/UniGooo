@@ -34,12 +34,12 @@ const SplashScreen = () => {
         )}`}
       >
         <img
-          src="/src/assets/bg-blob.png"
+          src="/assets/bg-blob.png"
           alt="Background"
           className="absolute inset-0 w-full h-full object-cover opacity-50"
         />
         <div className="relative z-10 flex items-center justify-center min-h-screen">
-          <img src="/src/assets/splash-1.png" alt="Splash" className="w-64" />
+          <img src="/assets/splash-1.png" alt="Splash" className="w-64" />
         </div>
       </div>
 
@@ -53,7 +53,7 @@ const SplashScreen = () => {
             Safe, fast and affordable rides at your fingertips.
           </h1>
           <img
-            src="/src/assets/splash-2.png"
+            src="/assets/splash-2.png"
             alt="Splash"
             className="w-64 mx-auto"
           />
@@ -72,7 +72,7 @@ const SplashScreen = () => {
             Thrive Together
           </h1>
           <img
-            src="/src/assets/splash-3.png"
+            src="/assets/splash-3.png"
             alt="Splash"
             className="w-64 mx-auto"
           />
@@ -92,7 +92,7 @@ const SplashScreen = () => {
 
           {/* Illustration */}
           <div className="flex justify-center">
-            <img src="/src/assets/splash-4.png" alt="Splash" className="w-72" />
+            <img src="/assets/splash-4.png" alt="Splash" className="w-72" />
           </div>
         </div>
 

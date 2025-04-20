@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import VehicalCard from "./VehicalCard";
 import Findtop from "./Findtop";
-import bg1 from "../../assets/bg1.png";
+// Removed: import bg1 from "../../assets/bg1.png";
 import Footer from "../Search Destination/Footer";
 
 const FindVehical = () => {
@@ -19,7 +19,7 @@ const FindVehical = () => {
       <div
         className="fixed inset-0 z-0"
         style={{
-          backgroundImage: `url(${bg1})`,
+          backgroundImage: `url(/assets/bg1.png)`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -106,7 +106,6 @@ const FindVehical = () => {
 
         {/* Centered Button */}
         <div className="flex justify-center mt-6 mb-6">
-          {" "}
           {/* or use grid: grid place-items-center mt-6 */}
           <button
             onClick={handleCreateRideBtn}

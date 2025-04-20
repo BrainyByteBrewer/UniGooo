@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/splash-1.png";
-import homeImg from "../../assets/homeimg.png";
+// import logo from "../../assets/splash-1.png";
+// import homeImg from "../../assets/homeimg.png";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ function HomePage() {
           </div>
 
           <img
-            src={logo}
+            src="/assets/splash-1.png"
             alt="UniGo Logo"
             className="w-24 h-auto cursor-pointer"
             onClick={() => navigate("/")}
@@ -104,10 +104,10 @@ function HomePage() {
       <div className="flex-1 flex flex-col items-center w-full max-w-6xl mx-auto px-4 pt-20 pb-24 md:pt-32 md:pb-20">
         <div className="flex-1 flex items-center justify-center my-10">
           <img
-            src={homeImg}
-            alt="Rider Illustration"
-            className="max-w-[80%] h-auto"
-          />
+              src="/assets/homeimg.png"
+              alt="Rider Illustration"
+              className="max-w-[80%] h-auto"
+            />
         </div>
 
         <div className="w-full max-w-md mb-10 space-y-4">

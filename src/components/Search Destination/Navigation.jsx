@@ -47,11 +47,11 @@ const Navigation = () => {
   return (
     <div className="navigation bg-white flex items-center justify-between py-3 px-6">
       <div className="flex items-center gap-6">
-        <img
-          src="src\\assets\\logo.png"
-          alt="Logo"
-          className="h-24 w-24 object-contain"
-        />
+      <img
+        src="/assets/logo.png"
+        alt="Logo"
+        className="h-24 w-24 object-contain"
+/>
       </div>
       <div className="flex items-center gap-8">
         <button

@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { motion } from "framer-motion";
 const About = () => {
   return (
@@ -22,9 +22,9 @@ const About = () => {
         </p>
         <h2 className="mt-6">Our Vision</h2> {/* Added margin top */}
         <p>To create a future where technology empowers everyone.</p>
-        {/* Example image with rounded corners and shadow */}
-        <motion.img // Animated image
-          src="src\assets\logo.png"
+       {/* Example image with rounded corners and shadow */}
+       <motion.img // Animated image
+          src="/assets/logo.png"
           alt="Our Team"
           className="rounded-lg shadow-lg mt-6 mx-auto hover:scale-105 transition-transform duration-300" // Hover effect
           whileHover={{ scale: 0.9 }} // Scale on hover

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FaLessThan, FaStar, FaUser } from "react-icons/fa";
 import { BsChatDots } from "react-icons/bs";
 import { IoPeople } from "react-icons/io5";
-import carImage from "../../assets/bg1.png"; // Import your car image (adjust path if needed)
+
 
 const VehicleDetail = () => {
   // ... (state and functions - same as before)
@@ -114,7 +114,7 @@ const VehicleDetail = () => {
             >
               <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden">
                 <img
-                  src={carImage}
+                  src="/assets/bg1.png"
                   alt="Driver"
                   className="w-full h-full object-cover"
                 />

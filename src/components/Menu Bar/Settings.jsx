@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaLessThan, FaGreaterThan } from "react-icons/fa";
 import { IoNotifications, IoSettings } from "react-icons/io5";
 import { FaLock, FaMapMarkerAlt, FaInfoCircle } from "react-icons/fa";
-import unigoLogo from "../../assets/logo.png";
+// Removed: import unigoLogo from "../../assets/logo.png";
 const Settings = () => {
   const navigate = useNavigate();
 
@@ -64,7 +64,7 @@ const Settings = () => {
 
       {/* Logo at bottom */}
       <div className="flex justify-center items-center p-8">
-        <img src={unigoLogo} alt="Unigo Logo" className="w-32 h-auto" />
+        <img src="/assets/logo.png" alt="Unigo Logo" className="w-32 h-auto" />
       </div>
     </div>
   );
