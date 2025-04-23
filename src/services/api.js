@@ -1,13 +1,17 @@
 import axios from 'axios';
+import config from '../config';
 
 // Create an axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:4000/api', // Adjust this to match your backend URL
+  baseURL: config.API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true, // Important for cookies (JWT token)
 });
+
+// Log the API URL being used (for debugging)
+console.log('API URL:', config.API_URL);
 
 // Add a request interceptor to include auth token if available
 api.interceptors.request.use(
