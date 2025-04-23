@@ -1,18 +1,70 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FaUser, FaLock, FaFacebookF, FaGoogle } from "react-icons/fa";
 import Logo from "../common/Logo";
+import authService from "../../services/authService";
 
 const SignIn = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     emailOrNumber: "",
     password: "",
     acceptTerms: false,
   });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(location.state?.message || "");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
+
+    // Basic validation
+    if (!formData.emailOrNumber || !formData.password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    if (!formData.acceptTerms) {
+      setError("Please accept the terms and conditions");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // Determine if input is email or phone number
+      const isEmail = formData.emailOrNumber.includes('@');
+
+      // For login, backend expects email field
+      // If user entered a phone number, we need to check if a user exists with that phone number
+      // For now, we'll just use the email field as the backend expects
+      const loginData = {
+        email: formData.emailOrNumber,
+        password: formData.password
+      };
+
+      console.log('Attempting login with:', loginData);
+      const response = await authService.login(loginData);
+
+      // Save user data to local storage
+      authService.setCurrentUser(response.user);
+
+      // Redirect to home page
+      navigate('/home');
+    } catch (err) {
+      console.error('Login error in component:', err);
+      if (err.message) {
+        setError(err.message);
+      } else if (typeof err === 'string') {
+        setError(err);
+      } else {
+        setError("Login failed. Please check your credentials.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -74,11 +126,20 @@ const SignIn = () => {
             </label>
           </div>
 
+          {error && (
+            <p className="text-red-500 text-sm text-center">{error}</p>
+          )}
+
+          {success && (
+            <p className="text-green-500 text-sm text-center">{success}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full bg-purple-800 text-white py-3 text-lg rounded-full hover:bg-purple-900/90"
+            disabled={loading}
+            className={`w-full bg-purple-800 text-white py-3 text-lg rounded-full hover:bg-purple-900/90 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Submit
+            {loading ? "Logging in..." : "Submit"}
           </button>
         </form>
 
@@ -99,10 +160,24 @@ const SignIn = () => {
         </div>
 
         <div className="mt-6 flex justify-center space-x-4">
-          <button className="w-10 h-10 rounded-full bg-purple-800 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              // Handle Facebook login
+              setError("Social login will be implemented soon");
+            }}
+            className="w-10 h-10 rounded-full bg-purple-800 flex items-center justify-center"
+          >
             <FaFacebookF className="text-white text-lg" />
           </button>
-          <button className="w-10 h-10 rounded-full bg-purple-800 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => {
+              // Handle Google login
+              setError("Social login will be implemented soon");
+            }}
+            className="w-10 h-10 rounded-full bg-purple-800 flex items-center justify-center"
+          >
             <FaGoogle className="text-white text-lg" />
           </button>
         </div>

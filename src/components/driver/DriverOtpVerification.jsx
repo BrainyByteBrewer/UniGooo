@@ -1,14 +1,26 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import authService from "../../services/authService";
 
 const DriverOtpVerification = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [otp, setOtp] = useState(["", "", "", ""]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
+
+  // Get contact info from location state
+  const { mobileNumber, email, contactMethod } = location.state || {};
 
   useEffect(() => {
     inputRefs[0].current?.focus();
-  }, []);
+
+    // Redirect back to signup choice if no contact info is provided
+    if (!mobileNumber && !email) {
+      navigate("/signup/driver/choice");
+    }
+  }, [mobileNumber, email, navigate]);
 
   const handleChange = (index, value) => {
     if (value.length <= 1 && /^\d*$/.test(value)) {
@@ -28,9 +40,41 @@ const DriverOtpVerification = () => {
     }
   };
 
-  const handleConfirm = () => {
-    if (otp.every((digit) => digit)) {
-      navigate("/signup/driver/registration");
+  const handleConfirm = async () => {
+    // Validate OTP
+    if (!otp.every((digit) => digit)) {
+      setError("Please enter a valid 4-digit OTP");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // Prepare data for OTP verification
+      const otpValue = otp.join('');
+      const verifyData = {
+        otp: otpValue,
+        ...(contactMethod === "email" ? { email } : { phoneNumber: mobileNumber })
+      };
+
+      // Verify OTP
+      console.log('Verifying OTP with data:', verifyData);
+      const response = await authService.verifyOTP(verifyData);
+      console.log('OTP verification response:', response);
+
+      // Navigate to driver registration page
+      navigate("/signup/driver/registration", {
+        state: {
+          mobileNumber,
+          email,
+          verified: true
+        }
+      });
+    } catch (err) {
+      setError(err.message || "Invalid OTP. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,12 +106,43 @@ const DriverOtpVerification = () => {
             ))}
           </div>
 
+          {error && (
+            <p className="text-red-500 text-sm text-center mb-4">{error}</p>
+          )}
+
           <button
             onClick={handleConfirm}
-            className="w-full bg-purple-800 text-white py-3 rounded-full font-semibold"
+            disabled={loading}
+            className={`w-full bg-purple-800 text-white py-3 rounded-full font-semibold ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Confirm
+            {loading ? "Verifying..." : "Confirm"}
           </button>
+
+          <p className="mt-4 text-sm text-center text-gray-600">
+            Didn't receive the OTP? {' '}
+            <button
+              onClick={async () => {
+                setLoading(true);
+                setError("");
+                try {
+                  const otpData = {
+                    contactMethod: contactMethod || (email ? "email" : "phone"),
+                    ...(email ? { email } : { phoneNumber: mobileNumber })
+                  };
+                  await authService.sendOTP(otpData);
+                  setError("OTP resent successfully");
+                } catch (err) {
+                  setError("Failed to resend OTP. Please try again.");
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              className="text-purple-800 font-semibold"
+              disabled={loading}
+            >
+              Resend OTP
+            </button>
+          </p>
         </div>
       </div>
     </div>

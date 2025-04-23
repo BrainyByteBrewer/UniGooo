@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import authService from "../../services/authService";
 import {
   FaUser,
   FaEnvelope,
@@ -14,20 +15,39 @@ import { IoCarSport } from "react-icons/io5";
 
 const DriverRegistration = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [generalError, setGeneralError] = useState("");
+
+  // Get verified contact info from location state
+  const { mobileNumber, email, verified } = location.state || {};
+
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
+    email: email || "",
     password: "",
     confirmPassword: "",
-    mobile: "",
+    mobile: mobileNumber || "",
     dob: "",
     vehicleNumber: "",
     drivingLicense: null,
     photo: null,
     universityId: null,
+    state: "Uttarakhand", // Default state
+    city: "Roorkee", // Default city
   });
+
+  useEffect(() => {
+    // Redirect back if not verified
+    if (!verified) {
+      console.log('User not verified, redirecting to signup choice');
+      navigate("/signup/driver/choice");
+    } else {
+      console.log('User verified, continuing with registration');
+    }
+  }, [verified, navigate]);
 
   const validateStep1 = () => {
     const newErrors = {};
@@ -135,10 +155,64 @@ const DriverRegistration = () => {
     setCurrentStep(1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateStep2()) {
-      navigate("/signin");
+      setLoading(true);
+      setGeneralError("");
+
+      try {
+        // Create FormData object for file uploads
+        const formDataObj = new FormData();
+        formDataObj.append('fullName', formData.fullName);
+        formDataObj.append('email', formData.email);
+        formDataObj.append('password', formData.password);
+        formDataObj.append('confirmPassword', formData.confirmPassword);
+        formDataObj.append('phoneNumber', formData.mobile);
+        formDataObj.append('dateOfBirth', formData.dob);
+        formDataObj.append('role', 'DRIVER');
+        formDataObj.append('vehicleNumber', formData.vehicleNumber);
+        formDataObj.append('state', formData.state || 'Uttarakhand');
+        formDataObj.append('city', formData.city || 'Roorkee');
+
+        // Append files
+        if (formData.drivingLicense) {
+          formDataObj.append('drivingLicense', formData.drivingLicense);
+        }
+        if (formData.photo) {
+          formDataObj.append('profilePhoto', formData.photo);
+        }
+        if (formData.universityId) {
+          formDataObj.append('universityIdCard', formData.universityId);
+        }
+
+        console.log('Attempting driver signup with:', formData.fullName, formData.email);
+
+        // Call signup API with FormData
+        const response = await authService.signup(formDataObj, true);
+        console.log('Driver signup successful:', response);
+
+        // Save user data if available
+        if (response.user) {
+          authService.setCurrentUser(response.user);
+        }
+
+        // Navigate to signin page with success message
+        navigate("/signin", {
+          state: { message: "Registration successful! Please login with your credentials." }
+        });
+      } catch (err) {
+        console.error('Driver signup error:', err);
+        if (err.message) {
+          setGeneralError(err.message);
+        } else if (typeof err === 'string') {
+          setGeneralError(err);
+        } else {
+          setGeneralError("Registration failed. Please try again.");
+        }
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -433,21 +507,29 @@ const DriverRegistration = () => {
                   )}
                 </div>
 
+                {generalError && (
+                  <p className="text-red-500 text-sm text-center mt-4">{generalError}</p>
+                )}
+
                 <div className="flex space-x-4 mt-6">
                   <button
                     type="button"
                     onClick={handlePrevStep}
-                    className="w-1/2 border-2 border-purple-800 text-purple-800 py-4 rounded-full 
-                             font-semibold text-lg hover:bg-purple-50 transition-colors"
+                    disabled={loading}
+                    className="w-1/2 border-2 border-purple-800 text-purple-800 py-4 rounded-full
+                             font-semibold text-lg hover:bg-purple-50 transition-colors
+                             disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Back
                   </button>
                   <button
                     type="submit"
-                    className="w-1/2 bg-purple-800 text-white py-4 rounded-full font-semibold text-lg 
-                             hover:bg-purple-700 transition-colors"
+                    disabled={loading}
+                    className="w-1/2 bg-purple-800 text-white py-4 rounded-full font-semibold text-lg
+                             hover:bg-purple-700 transition-colors
+                             disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Submit
+                    {loading ? "Submitting..." : "Submit"}
                   </button>
                 </div>
               </div>

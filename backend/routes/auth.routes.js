@@ -7,6 +7,7 @@ const { verifyOTP } = require('../controllers/auth/verifyOTP');
 const { signup } = require('../controllers/auth/signup');
 const { login } = require('../controllers/auth/login');
 const { socialLogin } = require('../controllers/auth/socialLogin');
+const { changePassword } = require('../controllers/auth/changePassword');
 const { User } = require('../models/User');
 
 // Routes
@@ -15,6 +16,7 @@ router.post('/verify-otp', verifyOTP);
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/social-login', socialLogin);
+router.post('/change-password', changePassword);
 
 // Add this route for debugging
 router.get('/check-user/:email', async (req, res) => {
@@ -34,4 +36,4 @@ router.get('/check-user/:email', async (req, res) => {
     }
 });
 
-module.exports = router; 
+module.exports = router;

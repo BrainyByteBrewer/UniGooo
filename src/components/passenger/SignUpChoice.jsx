@@ -151,14 +151,18 @@
 // export default SignUpChoice;
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { MdEmail, MdPhone } from "react-icons/md";
+import authService from "../../services/authService";
+import Logo from "../common/Logo";
 
 const SignUpChoice = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileNumber, setMobileNumber] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const validateMobile = (mobile) => {
     return mobile.length === 10 && /^\d+$/.test(mobile);
@@ -182,7 +186,7 @@ const SignUpChoice = () => {
     setError("");
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!mobileNumber && !email) {
       setError("Please enter either mobile number or email");
       return;
@@ -198,9 +202,32 @@ const SignUpChoice = () => {
       return;
     }
 
-    navigate("/signup/passenger/otp", {
-      state: { mobileNumber, email },
-    });
+    setLoading(true);
+    setError("");
+
+    try {
+      // Prepare data for OTP request
+      const otpData = {
+        contactMethod: email ? "email" : "phone",
+        ...(email ? { email } : { phoneNumber: mobileNumber })
+      };
+
+      // Send OTP request
+      const response = await authService.sendOTP(otpData);
+
+      // Navigate to OTP verification page with contact info
+      navigate("/signup/passenger/otp", {
+        state: {
+          mobileNumber,
+          email,
+          contactMethod: otpData.contactMethod
+        },
+      });
+    } catch (err) {
+      setError(err.message || "Failed to send OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -259,10 +286,11 @@ const SignUpChoice = () => {
 
             <button
               onClick={handleContinue}
-              className="w-full py-4 text-xl font-semibold text-white bg-purple-800 
-                     rounded-full transition-colors mt-6"
+              disabled={loading}
+              className={`w-full py-4 text-xl font-semibold text-white bg-purple-800
+                     rounded-full transition-colors mt-6 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              Continue
+              {loading ? "Sending OTP..." : "Continue"}
             </button>
           </div>
 

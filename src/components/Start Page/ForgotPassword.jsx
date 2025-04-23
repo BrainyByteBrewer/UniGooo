@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import authService from "../../services/authService";
 import { FaFacebookF, FaGoogle } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import Logo from "../common/Logo";
@@ -7,11 +8,51 @@ import Button from "../common/Button";
 import Input from "../common/Input";
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const [contactInfo, setContactInfo] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle password reset
+
+    if (!contactInfo.trim()) {
+      setError("Please enter your email or phone number");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      // Determine if input is email or phone number
+      const isEmail = contactInfo.includes('@');
+
+      // Prepare data for password reset request
+      const resetData = {
+        contactMethod: isEmail ? "email" : "phone",
+        ...(isEmail ? { email: contactInfo } : { phoneNumber: contactInfo })
+      };
+
+      // Send password reset request
+      await authService.sendOTP(resetData);
+
+      // Navigate to OTP verification for password reset
+      navigate("/signup/passenger/otp", {
+        state: {
+          ...(isEmail ? { email: contactInfo } : { mobileNumber: contactInfo }),
+          contactMethod: resetData.contactMethod,
+          isPasswordReset: true
+        }
+      });
+    } catch (err) {
+      console.error('Password reset error:', err);
+      setError(err.message || "Failed to send reset code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,12 +69,25 @@ const ForgotPassword = () => {
           <Input
             type="text"
             placeholder="Enter Email or Number"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={contactInfo}
+            onChange={(e) => setContactInfo(e.target.value)}
             icon={<MdEmail className="w-6 h-6 text-purple-800" />}
           />
 
-          <Button type="submit">Send</Button>
+          {error && (
+            <p className="text-red-500 text-sm text-center">{error}</p>
+          )}
+
+          {success && (
+            <p className="text-green-500 text-sm text-center">{success}</p>
+          )}
+
+          <Button
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Sending..." : "Send Reset Code"}
+          </Button>
         </form>
 
         <div className="mt-8 text-center space-y-2">

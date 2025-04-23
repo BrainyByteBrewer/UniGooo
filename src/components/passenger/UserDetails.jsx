@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   FaUser,
   FaEnvelope,
@@ -10,18 +10,38 @@ import {
 
 import { MdPhone } from "react-icons/md";
 import Logo from "../common/Logo";
+import authService from "../../services/authService";
 const UserDetails = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [generalError, setGeneralError] = useState("");
+
+  // Get verified contact info from location state
+  const { mobileNumber, email, verified } = location.state || {};
+
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
+    email: email || "",
     password: "",
     confirmPassword: "",
-    mobile: "",
+    mobile: mobileNumber || "",
     dob: "",
     course: "",
+    state: "Uttarakhand", // Default state
+    city: "Roorkee", // Default city
   });
+
+  useEffect(() => {
+    // Redirect back if not verified
+    if (!verified) {
+      console.log('User not verified, redirecting to signup choice');
+      navigate("/signup/passenger/choice");
+    } else {
+      console.log('User verified, continuing with registration');
+    }
+  }, [verified, navigate]);
 
   const getCurrentDate = () => {
     const today = new Date();
@@ -92,10 +112,57 @@ const UserDetails = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      navigate("/signin");
+      setLoading(true);
+      setGeneralError("");
+
+      try {
+        // Prepare data for signup
+        const signupData = {
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+          phoneNumber: formData.mobile,
+          dateOfBirth: formData.dob,
+          role: "PASSENGER",
+          course: formData.course,
+          state: formData.state || "Uttarakhand",
+          city: formData.city || "Roorkee"
+        };
+
+        // Log the OTP verification status
+        console.log('OTP verification status:', verified);
+
+        console.log('Attempting signup with:', signupData);
+
+        // Call signup API
+        const response = await authService.signup(signupData);
+        console.log('Signup successful:', response);
+
+        // Save user data if available
+        if (response.user) {
+          authService.setCurrentUser(response.user);
+        }
+
+        // Navigate to signin page with success message
+        navigate("/signin", {
+          state: { message: "Registration successful! Please login with your credentials." }
+        });
+      } catch (err) {
+        console.error('Signup error in component:', err);
+        if (err.message) {
+          setGeneralError(err.message);
+        } else if (typeof err === 'string') {
+          setGeneralError(err);
+        } else {
+          setGeneralError("Registration failed. Please try again.");
+        }
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -261,12 +328,17 @@ const UserDetails = () => {
             )}
           </div>
 
+          {generalError && (
+            <p className="text-red-500 text-sm text-center mt-4">{generalError}</p>
+          )}
+
           <button
             type="submit"
-            className="w-full py-3 text-xl font-semibold text-white bg-purple-800 
-                     rounded-full transition-colors mt-6"
+            disabled={loading}
+            className={`w-full py-3 text-xl font-semibold text-white bg-purple-800
+                     rounded-full transition-colors mt-6 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Sign Up
+            {loading ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
 
