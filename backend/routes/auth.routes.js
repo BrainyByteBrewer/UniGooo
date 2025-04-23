@@ -11,12 +11,17 @@ const { changePassword } = require('../controllers/auth/changePassword');
 const { User } = require('../models/User');
 
 // Routes
-router.post('/send-otp', sendOTP);
-router.post('/verify-otp', verifyOTP);
+// Using alternative names to avoid ad blockers
+router.post('/send-verification', sendOTP);
+router.post('/confirm-verification', verifyOTP);
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/social-login', socialLogin);
 router.post('/change-password', changePassword);
+
+// Keep old routes for backward compatibility
+router.post('/send-otp', sendOTP);
+router.post('/verify-otp', verifyOTP);
 
 // Add this route for debugging
 router.get('/check-user/:email', async (req, res) => {

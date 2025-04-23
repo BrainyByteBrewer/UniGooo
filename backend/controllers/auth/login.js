@@ -32,12 +32,14 @@ exports.login = async (req, res) => {
         // Generate token
         const token = user.generateAuthToken();
 
-        // Set cookie
+        // Set cookie with proper settings for cross-domain requests
         const options = {
             expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-            httpOnly: true
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Allow cross-site cookies in production
         };
-        
+
         // // Additional driver-specific data
         // const userData = {
         //     _id: user._id,
@@ -76,4 +78,4 @@ exports.login = async (req, res) => {
             error: error.message
         });
     }
-}; 
+};

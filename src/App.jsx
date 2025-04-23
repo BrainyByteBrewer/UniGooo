@@ -38,6 +38,7 @@ import SechduleRide from "./components/Sechdule Ride/SechduleRide";
 import AppSettings from "./components/App Setting/AppSetting";
 import ChangePassword from "./components/Change Password/ChangePassword";
 import About from "./components/About Us/AboutUs";
+import TestConnection from "./components/TestConnection";
 import DriverMenubar from "./components/Driver Menubar/DriveMenubar";
 import RideDetails from "./components/Driver Menubar/RideDetails";
 import DriverProfile from "./components/Driver Menubar/DriverProfile";
@@ -101,6 +102,7 @@ function App() {
         <Route path="/driver-menue" element={<DriverMenubar />} />
         <Route path="/ride-details" element={<RideDetails />} />
         <Route path="/driver-profile" element={<DriverProfile />} />
+        <Route path="/test-connection" element={<TestConnection />} />
       </Routes>
     </Router>
 

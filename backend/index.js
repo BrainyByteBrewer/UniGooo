@@ -20,9 +20,15 @@ cloudinaryConnect();
 
 const cors = require("cors");
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    // Allow requests from both localhost and your Vercel domain
+    origin: ["http://localhost:5173", "http://localhost:3000", "https://unigooo.vercel.app"],
     credentials: true
 }));
+
+// Log CORS configuration
+console.log('CORS configuration:', {
+    origins: ["http://localhost:5173", "http://localhost:3000", "https://unigooo.vercel.app"],
+});
 
 app.use(express.json());
 app.use(cookieParser());
@@ -49,4 +55,4 @@ app.get("/", (req, res) => {
 //Activate server
 app.listen(PORT, () => {
     console.log(`App is running successfully on ${PORT}`);
-}) 
+})

@@ -55,7 +55,18 @@ exports.changePassword = async (req, res) => {
         user.password = hashedPassword;
         await user.save();
 
-        return res.status(200).json({
+        // Generate a new token after password change
+        const token = user.generateAuthToken();
+
+        // Set cookie with proper settings for cross-domain requests
+        const options = {
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Only use HTTPS in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' // Allow cross-site cookies in production
+        };
+
+        return res.cookie("token", token, options).status(200).json({
             success: true,
             message: "Password changed successfully"
         });

@@ -5,9 +5,12 @@ const authService = {
   // Send OTP to email or phone
   sendOTP: async (contactData) => {
     try {
-      const response = await api.post('/auth/send-otp', contactData);
+      // Use the new endpoint name to avoid ad blockers
+      const response = await api.post('/auth/send-verification', contactData);
+      console.log('Send verification response:', response.data);
       return response.data;
     } catch (error) {
+      console.error('Send verification error:', error);
       throw error.response ? error.response.data : error;
     }
   },
@@ -15,12 +18,13 @@ const authService = {
   // Verify OTP
   verifyOTP: async (otpData) => {
     try {
-      console.log('VerifyOTP request payload:', otpData);
-      const response = await api.post('/auth/verify-otp', otpData);
-      console.log('VerifyOTP response:', response.data);
+      console.log('Verify code request payload:', otpData);
+      // Use the new endpoint name to avoid ad blockers
+      const response = await api.post('/auth/confirm-verification', otpData);
+      console.log('Verify code response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('VerifyOTP error:', error.response ? error.response.data : error);
+      console.error('Verify code error:', error.response ? error.response.data : error);
       throw error.response ? error.response.data : error;
     }
   },
